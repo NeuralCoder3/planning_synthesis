@@ -9,137 +9,185 @@
 ; we need k distinct variables in parameters 
 
 (:types
-    register number permutation
+    register number permutation command
 )
 
 (:predicates
     (less-than ?n1 - number ?n2 - number)
+    ; avoid negative preconditions
+    (less-than-or-equal ?n1 - number ?n2 - number)
+    (next_perm ?p1 - permutation ?p2 - permutation)
+
     ; no explicit greater than as a>b iff b<a
     (contains ?p - permutation ?r - register ?n - number)
     (less-flag ?p - permutation)
     (greater-flag ?p - permutation)
+    (active ?p - permutation)
+    (chosen ?c - command ?r1 - register ?r2 - register)
 )
 
-<%python
-pairs = [(f"perm{i}", f"p{i}") for i in range(1, 6+1)]
-%>
+(:action choose_command
+    :parameters (
+        ?c - command
+        ?r1 - register
+        ?r2 - register 
 
-(:action move
+        ?c_old - command
+        ?r1_old - register
+        ?r2_old - register
+    )
+    :precondition (and 
+        (active endperm)
+        (chosen ?c_old ?r1_old ?r2_old)
+    )
+    :effect (and 
+        (chosen ?c ?r1 ?r2)
+        (active perm1)
+        (not (active endperm))
+        (not (chosen ?c_old ?r1_old ?r2_old))
+    )
+)
+
+
+(:action apply_move
     :parameters (
         ?r1 - register ; to
         ?r2 - register ; from
 
-        <%python
-        for perm, short in pairs:
-            print(f"?n1_{short} - number")
-            print(f"?n2_{short} - number")
-        %>
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        <%python
-        for perm, short in pairs:
-            print(f"(contains {perm} ?r1 ?n1_{short})")
-            print(f"(contains {perm} ?r2 ?n2_{short})")
-        %>
+        (next_perm ?p ?pn)
+        (active ?p)
+
+        (contains ?p ?r1 ?n1)
+        (contains ?p ?r2 ?n2)
+
+        (chosen move ?r1 ?r2)
     )
     :effect (and
-        <%python
-        for perm, short in pairs:
-            print(f"(contains {perm} ?r1 ?n2_{short})")
-            print(f"(not (contains {perm} ?r1 ?n1_{short}))")
-        %>
+        (active ?pn)
+        (not (active ?p))
+
+        (contains ?p ?r1 ?n2)
+        (not (contains ?p ?r1 ?n1))
     )
 )
 
-; we could have a compare_true and compare_false or a single compare with a conditional effect
-(:action compare
-    :parameters (
-        ?r1 - register
-        ?r2 - register
 
-        <%python
-        for perm, short in pairs:
-            print(f"?n1_{short} - number")
-            print(f"?n2_{short} - number")
-        %>
+
+(:action apply_cmp_true
+    :parameters (
+        ?r1 - register ; to
+        ?r2 - register ; from
+
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        <%python
-        for perm, short in pairs:
-            print(f"(contains {perm} ?r1 ?n1_{short})")
-            print(f"(contains {perm} ?r2 ?n2_{short})")
-        %>
+        (next_perm ?p ?pn)
+        (active ?p)
+
+        (contains ?p ?r1 ?n1)
+        (contains ?p ?r2 ?n2)
+
+        (chosen cmp ?r1 ?r2)
+        (less-than ?n1 ?n2)
     )
     :effect (and
-        <%python
-        for perm, short in pairs:
-            print(f"(when (     less-than ?n1_{short} ?n2_{short} ) (     less-flag    {perm} ))")
-            print(f"(when (not (less-than ?n1_{short} ?n2_{short})) (not (less-flag    {perm} )))")
-            print(f"(when (     less-than ?n2_{short} ?n1_{short} ) (     greater-flag {perm} ))")
-            print(f"(when (not (less-than ?n2_{short} ?n1_{short})) (not (greater-flag {perm} )))")
-        %>
+        (active ?pn)
+        (not (active ?p))
+
+        (less-flag ?p)
+    )
+)
+(:action apply_cmp_false
+    :parameters (
+        ?r1 - register ; to
+        ?r2 - register ; from
+
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
+    )
+    :precondition (and
+        (next_perm ?p ?pn)
+        (active ?p)
+
+        (contains ?p ?r1 ?n1)
+        (contains ?p ?r2 ?n2)
+
+        (chosen cmp ?r1 ?r2)
+        (less-than-or-equal ?n2 ?n1)
+    )
+    :effect (and
+        (active ?pn)
+        (not (active ?p))
+
+        (not (less-flag ?p))
     )
 )
 
-; we could have a working cmovl and noop cmovl
-; that are the same as move with less-flag as additional precondition
-; or a single cmovl with conditional effect
-; importantly: cmovl should also be applicable when less-flag is false
-; => intuitively every instruction is always possible 
-; => all same precondition that to not restrict but just establish the values
-(:action cmovl
-    :parameters (
-        ?r1 - register
-        ?r2 - register
 
-        <%python
-        for perm, short in pairs:
-            print(f"?n1_{short} - number")
-            print(f"?n2_{short} - number")
-        %>
+(:action apply_cmovl_true
+    :parameters (
+        ?r1 - register ; to
+        ?r2 - register ; from
+
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        <%python
-        for perm, short in pairs:
-            print(f"(contains {perm} ?r1 ?n1_{short})")
-            print(f"(contains {perm} ?r2 ?n2_{short})")
-        %>
+        (next_perm ?p ?pn)
+        (active ?p)
+
+        (contains ?p ?r1 ?n1)
+        (contains ?p ?r2 ?n2)
+
+        (chosen cmovl ?r1 ?r2)
+        (less-flag ?p)
     )
     :effect (and
-        <%python
-        for perm, short in pairs:
-            print(f"(when (less-flag {perm} ) (and ")
-            print(f"      (contains {perm} ?r1 ?n2_{short})")
-            print(f"      (not (contains {perm} ?r1 ?n1_{short}))))")
-        %>
+        (active ?pn)
+        (not (active ?p))
+
+        (contains ?p ?r1 ?n2)
+        (not (contains ?p ?r1 ?n1))
     )
 )
 
-(:action cmovg
+(:action apply_cmovl_false
     :parameters (
-        ?r1 - register
-        ?r2 - register
+        ?r1 - register ; to
+        ?r2 - register ; from
 
-        <%python
-        for perm, short in pairs:
-            print(f"?n1_{short} - number")
-            print(f"?n2_{short} - number")
-        %>
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        <%python
-        for perm, short in pairs:
-            print(f"(contains {perm} ?r1 ?n1_{short})")
-            print(f"(contains {perm} ?r2 ?n2_{short})")
-        %>
+        (next_perm ?p ?pn)
+        (active ?p)
+
+        (contains ?p ?r1 ?n1)
+        (contains ?p ?r2 ?n2)
+
+        (chosen cmovl ?r1 ?r2)
+        (not (less-flag ?p))
     )
     :effect (and
-        <%python
-        for perm, short in pairs:
-            print(f"(when (greater-flag {perm} ) (and ")
-            print(f"      (contains {perm} ?r1 ?n2_{short})")
-            print(f"      (not (contains {perm} ?r1 ?n1_{short}))))")
-        %>
+        (active ?pn)
+        (not (active ?p))
+        ; nop
     )
 )
 
