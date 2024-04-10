@@ -21,43 +21,22 @@
     (less-than one three)
     (less-than two three)
 
-; perm1 123
-(contains perm1 reg1 one)
-(contains perm1 reg2 two)
-(contains perm1 reg3 three)
-(contains perm1 swap1 zero)
+<%python
+import itertools
+n = 3
+swap = 1
+permutations = list(itertools.permutations(range(1, n+1)))
 
-; perm2 132
-(contains perm2 reg1 one)
-(contains perm2 reg2 three)
-(contains perm2 reg3 two)
-(contains perm2 swap1 zero)
+names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 
-; perm3 213
-(contains perm3 reg1 two)
-(contains perm3 reg2 one)
-(contains perm3 reg3 three)
-(contains perm3 swap1 zero)
-
-; perm4 231
-(contains perm4 reg1 two)
-(contains perm4 reg2 three)
-(contains perm4 reg3 one)
-(contains perm4 swap1 zero)
-
-; perm5 312
-(contains perm5 reg1 three)
-(contains perm5 reg2 one)
-(contains perm5 reg3 two)
-(contains perm5 swap1 zero)
-
-; perm6 321
-(contains perm6 reg1 three)
-(contains perm6 reg2 two)
-(contains perm6 reg3 one)
-(contains perm6 swap1 zero)
-
-
+for k, perm in enumerate(permutations):
+    print(f"; perm{k+1} "+"".join(map(str, perm)))
+    for i, p in enumerate(perm):
+        print(f"(contains perm{k+1} reg{i+1} {names[p]})")
+    for i in range(swap):
+        print(f"(contains perm{k+1} swap{i+1} zero)")
+    print()
+%>
 )
 
 (:goal
