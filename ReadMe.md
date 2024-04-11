@@ -35,6 +35,7 @@ works with conditional effect
 
 
 
+fast-downward domain.pddl problem.pddl --search "astar(ipdb())"
 
 
 

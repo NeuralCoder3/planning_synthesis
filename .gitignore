@@ -1,3 +1,5 @@
 domain.pddl
 test*.txt
 problem.pddl
+*.sas
+sas_plan

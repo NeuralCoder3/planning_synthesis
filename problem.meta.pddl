@@ -2,6 +2,14 @@
 
 (:domain sorting)
 
+<%python
+import math
+n = 3
+use_perms = -1
+if use_perms == -1:
+    use_perms = math.factorial(n)
+%>
+
 (:objects
     ; possible numbers
     zero one two three - number
@@ -9,7 +17,13 @@
     reg1 reg2 reg3 - register
     swap1 - register
     ; possible permutations
-    perm1 perm2 perm3 perm4 perm5 perm6 endperm - permutation
+    <%python
+    print(space, end="")
+    for i in range(1, use_perms+1):
+        print(f"perm{i} ", end="")
+    print("endperm - permutation")
+    %>
+
     move cmovl cmp - command
     ; cmovg
 )
@@ -35,35 +49,34 @@
     (less-than-or-equal three three)
 
     ; permutation facts
-    (next_perm perm1 perm2)
-    (next_perm perm2 perm3)
-    (next_perm perm3 perm4)
-    (next_perm perm4 perm5)
-    (next_perm perm5 perm6)
-    (next_perm perm6 endperm)
+    <%python
+    for i in range(1, use_perms):
+        print(f"{space}(next_perm perm{i} perm{i+1})")
+    print(f"{space}(next_perm perm{use_perms} endperm)")
+    %>
 
     ; at end/start of an instruction cycle
     (active endperm)
     ; dummy command
     (chosen cmp reg1 reg1)
 
-<%python
-import itertools
-n = 3
-swap = 1
-permutations = list(itertools.permutations(range(1, n+1)))
+    <%python
+    import itertools
+    swap = 1
+    permutations = list(itertools.permutations(range(1, n+1)))
+    permutations = permutations[:use_perms]
 
-names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 
-for k, perm in enumerate(permutations):
-    print(f"; perm{k+1} "+"".join(map(str, perm)))
-    for i, p in enumerate(perm):
-        print(f"(contains perm{k+1} reg{i+1} {names[p]})")
-    for i in range(swap):
-        print(f"(contains perm{k+1} swap{i+1} zero)")
-    print()
-%>
-)
+    for k, perm in enumerate(permutations):
+        print(f"{space}; perm{k+1} "+"".join(map(str, perm)))
+        for i, p in enumerate(perm):
+            print(f"{space}(contains perm{k+1} reg{i+1} {names[p]})")
+        for i in range(swap):
+            print(f"{space}(contains perm{k+1} swap{i+1} zero)")
+        print()
+    %>
+    )
 
 (:goal
     (and
@@ -72,7 +85,7 @@ for k, perm in enumerate(permutations):
         <%python
         for p in range(1, len(permutations)+1):
             for i in range(1, n+1):
-                print(f"(contains perm{p} reg{i} {names[i]})")
+                print(f"{space}(contains perm{p} reg{i} {names[i]})")
             print()
         %>
     )

@@ -2,7 +2,7 @@
 
 (define (domain sorting)
 
-(:requirements :strips :typing :negative-preconditions :conditional-effects)
+(:requirements :strips :typing :negative-preconditions)
 
 ; :universal-preconditions
 ; allows forall but only in goals and precondition

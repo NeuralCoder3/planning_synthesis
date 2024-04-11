@@ -19,6 +19,7 @@ def process_string(lines):
     new_lines = []
     python_block = []
     in_python_block = False
+    indent = 0
 
     # Custom scope for Python execution
     custom_scope = {}
@@ -27,6 +28,7 @@ def process_string(lines):
         if '<%python' in line:
             in_python_block = True
             python_block = []
+            indent = len(re.match(r'^\s*', line).group())
         elif '%>' in line:
             in_python_block = False
             # Remove common leading whitespace
@@ -35,6 +37,9 @@ def process_string(lines):
             # print("Executing Python block:")
             # print('\n'.join(python_block))
             # Execute the Python block in the custom scope
+            # add indent to custom_scope
+            custom_scope['indent'] = indent
+            custom_scope['space'] = ' ' * indent
             with Capturing() as output:
                 exec('\n'.join(python_block), custom_scope)
             # Replace the Python block with its stdout
