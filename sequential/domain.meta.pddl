@@ -2,49 +2,41 @@
 
 (define (domain sorting)
 
-(:requirements :strips :negative-preconditions)
+(:requirements :strips :typing :negative-preconditions)
 
 ; :universal-preconditions
 ; allows forall but only in goals and precondition
 ; we need k distinct variables in parameters 
 
-(:predicates
-    (register ?r)
-    (number ?n)
-    (permutation ?p)
-    (command ?c)
+(:types
+    register number permutation command
+)
 
-    (less-than ?n1 ?n2 )
+(:predicates
+    (less-than ?n1 - number ?n2 - number)
     ; avoid negative preconditions
-    (less-than-or-equal ?n1 ?n2 )
-    (next_perm ?p1 ?p2 )
+    (less-than-or-equal ?n1 - number ?n2 - number)
+    (next_perm ?p1 - permutation ?p2 - permutation)
 
     ; no explicit greater than as a>b iff b<a
-    (contains ?p ?r ?n )
-    (less-flag ?p )
-    (greater-flag ?p )
-    (active ?p )
-    (chosen ?c ?r1 ?r2 )
+    (contains ?p - permutation ?r - register ?n - number)
+    (less-flag ?p - permutation)
+    (greater-flag ?p - permutation)
+    (active ?p - permutation)
+    (chosen ?c - command ?r1 - register ?r2 - register)
 )
 
 (:action choose_command
     :parameters (
-        ?c
-        ?r1
-        ?r2
+        ?c - command
+        ?r1 - register
+        ?r2 - register 
 
-        ?c_old
-        ?r1_old
-        ?r2_old
+        ?c_old - command
+        ?r1_old - register
+        ?r2_old - register
     )
     :precondition (and 
-        (command ?c)
-        (register ?r1)
-        (register ?r2)
-        (command ?c_old)
-        (register ?r1_old)
-        (register ?r2_old)
-
         (active endperm)
         (chosen ?c_old ?r1_old ?r2_old)
     )
@@ -59,22 +51,15 @@
 
 (:action apply_move
     :parameters (
-        ?r1 ; to
-        ?r2 ; from
+        ?r1 - register ; to
+        ?r2 - register ; from
 
-        ?p
-        ?n1
-        ?n2
-        ?pn
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        (register ?r1)
-        (register ?r2)
-        (permutation ?p)
-        (number ?n1)
-        (number ?n2)
-        (permutation ?pn)
-
         (next_perm ?p ?pn)
         (active ?p)
 
@@ -96,22 +81,15 @@
 
 (:action apply_cmp_true
     :parameters (
-        ?r1
-        ?r2
+        ?r1 - register ; to
+        ?r2 - register ; from
 
-        ?p
-        ?n1
-        ?n2
-        ?pn
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        (register ?r1)
-        (register ?r2)
-        (permutation ?p)
-        (number ?n1)
-        (number ?n2)
-        (permutation ?pn)
-
         (next_perm ?p ?pn)
         (active ?p)
 
@@ -130,22 +108,15 @@
 )
 (:action apply_cmp_false
     :parameters (
-        ?r1
-        ?r2
+        ?r1 - register ; to
+        ?r2 - register ; from
 
-        ?p
-        ?n1
-        ?n2
-        ?pn
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        (register ?r1)
-        (register ?r2)
-        (permutation ?p)
-        (number ?n1)
-        (number ?n2)
-        (permutation ?pn)
-
         (next_perm ?p ?pn)
         (active ?p)
 
@@ -166,22 +137,15 @@
 
 (:action apply_cmovl_true
     :parameters (
-        ?r1
-        ?r2
+        ?r1 - register ; to
+        ?r2 - register ; from
 
-        ?p
-        ?n1
-        ?n2
-        ?pn
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        (register ?r1)
-        (register ?r2)
-        (permutation ?p)
-        (number ?n1)
-        (number ?n2)
-        (permutation ?pn)
-
         (next_perm ?p ?pn)
         (active ?p)
 
@@ -202,22 +166,15 @@
 
 (:action apply_cmovl_false
     :parameters (
-        ?r1
-        ?r2
+        ?r1 - register ; to
+        ?r2 - register ; from
 
-        ?p
-        ?n1
-        ?n2
-        ?pn
+        ?p - permutation
+        ?n1 - number
+        ?n2 - number
+        ?pn - permutation
     )
     :precondition (and
-        (register ?r1)
-        (register ?r2)
-        (permutation ?p)
-        (number ?n1)
-        (number ?n2)
-        (permutation ?pn)
-
         (next_perm ?p ?pn)
         (active ?p)
 

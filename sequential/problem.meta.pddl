@@ -12,41 +12,23 @@ if use_perms == -1:
 
 (:objects
     ; possible numbers
-    zero one two three
+    zero one two three - number
     ; possible registers
-    reg1 reg2 reg3
-    swap1
+    reg1 reg2 reg3 - register
+    swap1 - register
     ; possible permutations
     <%python
     print(space, end="")
     for i in range(1, use_perms+1):
         print(f"perm{i} ", end="")
-    print("endperm")
+    print("endperm - permutation")
     %>
 
-    move cmovl cmp
+    move cmovl cmp - command
     ; cmovg
 )
 
 (:init
-    (number zero)
-    (number one)
-    (number two)
-    (number three)
-    (register reg1)
-    (register reg2)
-    (register reg3)
-    (register swap1)
-    (command move)
-    (command cmovl)
-    (command cmp)
-    <%python
-    for i in range(1, use_perms+1):
-        print(f"{space}(permutation perm{i})")
-    print(f"{space}(permutation endperm)")
-    %>
-
-
     ; universal facts (additionally to the object facts)
     (less-than zero one)
     (less-than zero two)
