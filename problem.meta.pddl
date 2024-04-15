@@ -85,6 +85,11 @@ else:
     (active endperm)
     ; dummy command
     (chosen cmp reg1 reg1)
+    <%python
+    for i in range(1, use_perms+1):
+        print(f"{space}(not-less-flag perm{i})")
+    %>
+
 
     <%python
     for k, perm in enumerate(permutations):

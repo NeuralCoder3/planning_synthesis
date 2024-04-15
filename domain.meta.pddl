@@ -2,7 +2,8 @@
 
 (define (domain sorting)
 
-(:requirements :strips :negative-preconditions)
+(:requirements :strips)
+; :negative-preconditions
 
 ; :universal-preconditions
 ; allows forall but only in goals and precondition
@@ -22,7 +23,8 @@
     ; no explicit greater than as a>b iff b<a
     (contains ?p ?r ?n )
     (less-flag ?p )
-    (greater-flag ?p )
+    (not-less-flag ?p )
+    ; (greater-flag ?p )
     (active ?p )
     (chosen ?c ?r1 ?r2 )
 )
@@ -126,6 +128,7 @@
         (not (active ?p))
 
         (less-flag ?p)
+        (not (not-less-flag ?p))
     )
 )
 (:action apply_cmp_false
@@ -160,6 +163,7 @@
         (not (active ?p))
 
         (not (less-flag ?p))
+        (not-less-flag ?p)
     )
 )
 
@@ -225,7 +229,7 @@
         (contains ?p ?r2 ?n2)
 
         (chosen cmovl ?r1 ?r2)
-        (not (less-flag ?p))
+        (not-less-flag ?p)
     )
     :effect (and
         (active ?pn)
