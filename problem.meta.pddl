@@ -4,17 +4,32 @@
 
 <%python
 import math
+import itertools
+swap = 1
+
+names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 n = 3
 use_perms = -1
+permutations = list(itertools.permutations(range(1, n+1)))
 if use_perms == -1:
-    use_perms = math.factorial(n)
+    use_perms = len(permutations)
+else:
+    permutations = permutations[:use_perms]
 %>
 
 (:objects
     ; possible numbers
-    zero one two three
+    <%python
+    for i in range(0, n+1):
+        print(f"{names[i]} ", end="")
+    print()
+    %>
     ; possible registers
-    reg1 reg2 reg3
+    <%python
+    for i in range(1, n+1):
+        print(f"reg{i} ", end="")
+    print()
+    %>
     swap1
     ; possible permutations
     <%python
@@ -29,13 +44,15 @@ if use_perms == -1:
 )
 
 (:init
-    (number zero)
-    (number one)
-    (number two)
-    (number three)
-    (register reg1)
-    (register reg2)
-    (register reg3)
+    ; numbers
+    <%python
+    for i in range(0, n+1):
+        print(f"{space}(number {names[i]})")
+    %>
+    <%python
+    for i in range(1, n+1):
+        print(f"{space}(register reg{i})")
+    %>
     (register swap1)
     (command move)
     (command cmovl)
@@ -48,23 +65,14 @@ if use_perms == -1:
 
 
     ; universal facts (additionally to the object facts)
-    (less-than zero one)
-    (less-than zero two)
-    (less-than zero three)
-    (less-than one two)
-    (less-than one three)
-    (less-than two three)
-
-    (less-than-or-equal zero zero)
-    (less-than-or-equal zero one)
-    (less-than-or-equal zero two)
-    (less-than-or-equal zero three)
-    (less-than-or-equal one one)
-    (less-than-or-equal one two)
-    (less-than-or-equal one three)
-    (less-than-or-equal two two)
-    (less-than-or-equal two three)
-    (less-than-or-equal three three)
+    <%python
+    for a in range(0, n+1):
+        for b in range(0, n+1):
+            if a < b:
+                print(f"{space}(less-than {names[a]} {names[b]})")
+            if a <= b:
+                print(f"{space}(less-than-or-equal {names[a]} {names[b]})")
+    %>
 
     ; permutation facts
     <%python
@@ -79,13 +87,6 @@ if use_perms == -1:
     (chosen cmp reg1 reg1)
 
     <%python
-    import itertools
-    swap = 1
-    permutations = list(itertools.permutations(range(1, n+1)))
-    permutations = permutations[:use_perms]
-
-    names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-
     for k, perm in enumerate(permutations):
         print(f"{space}; perm{k+1} "+"".join(map(str, perm)))
         for i, p in enumerate(perm):
@@ -99,6 +100,7 @@ if use_perms == -1:
 (:goal
     (and
         ; all to 123
+        (active endperm)
 
         <%python
         for p in range(1, len(permutations)+1):
